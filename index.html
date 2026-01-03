@@ -213,7 +213,7 @@
     <script>
         // BANCO DE DADOS
         let articles = JSON.parse(localStorage.getItem('sacra_articles')) || [
-            { id: 1, title: "Exemplo de Postagem", content: "Este é um artigo padrão.", status: "aprovado", image: "" }
+            { id: 1, title: "Exemplo de Postagem", content: "Este é um artigo padrão para demonstrar o visual da biblioteca. Você pode excluí-lo no painel administrativo usando a senha AMDG.", status: "aprovado", image: "" }
         ];
         let prayers = JSON.parse(localStorage.getItem('sacra_prayers')) || [];
 
@@ -233,9 +233,11 @@
         // LITURGIA (BASEADA EM DATA REAL)
         function updateLiturgia() {
             const h = new Date();
-            const dias = ["Domingo", "Segunda", "Terça", "Quarta", "Quinta", "Sexta", "Sábado"];
-            document.getElementById('tempo-liturgico').innerText = `Tempo do natal - ${dias[h.getDay()]}`;
-            document.getElementById('santo-do-dia').innerText = "Santo do dia em https://santo.cancaonova.com/";
+            const dias = ["Domingo", "Segunda-feira", "Terça-feira", "Quarta-feira", "Quinta-feira", "Sexta-feira", "Sábado"];
+            const meses = ["Janeiro", "Fevereiro", "Março", "Abril", "Maio", "Junho", "Julho", "Agosto", "Setembro", "Outubro", "Novembro", "Dezembro"];
+            
+            document.getElementById('tempo-liturgico').innerText = `Ciclo Litúrgico - ${dias[h.getDay()]}, ${h.getDate()} de ${meses[h.getMonth()]}`;
+            document.getElementById('santo-do-dia').innerText = "Veneração do dia conforme o Calendário Romano";
         }
 
         // ORAÇÕES
@@ -248,11 +250,12 @@
             localStorage.setItem('sacra_prayers', JSON.stringify(prayers));
             renderPrayers();
             document.getElementById('prayer-content').value = "";
+            alert("Sua intenção foi ofertada.");
         }
 
         function renderPrayers() {
             document.getElementById('prayer-wall').innerHTML = prayers.map(p => `
-                <div class="border-l-2 border-[var(--gold-primary)] pl-4 py-2 bg-white/5">
+                <div class="border-l-2 border-[var(--gold-primary)] pl-4 py-2 bg-white/5 transition hover:bg-white/10">
                     <p class="italic text-gray-300 font-reading">"${p.content}"</p>
                     <p class="text-[10px] text-[var(--gold-primary)] mt-1">— ${p.name}</p>
                 </div>
@@ -264,28 +267,42 @@
             const title = document.getElementById('art-title').value;
             const content = document.getElementById('art-content').value;
             const image = document.getElementById('art-image').value;
-            if(!title || !content) return;
+            if(!title || !content) return alert("Por favor, preencha o título e o conteúdo.");
 
             articles.push({ id: Date.now(), title, content, image, status: 'pendente' });
             localStorage.setItem('sacra_articles', JSON.stringify(articles));
-            alert("Enviado para moderação!");
+            alert("Artigo enviado! Aguarde a aprovação do moderador.");
+            
+            // Limpar campos
+            document.getElementById('art-title').value = "";
+            document.getElementById('art-content').value = "";
+            document.getElementById('art-image').value = "";
+            
             navigate('biblioteca');
         }
 
         function renderArticles() {
             const grid = document.getElementById('grid-artigos');
             const aprovados = articles.filter(a => a.status === 'aprovado');
+            
+            if(aprovados.length === 0) {
+                grid.innerHTML = '<p class="col-span-3 text-center text-gray-500 font-reading italic">O scriptorium está em silêncio... Nenhum manuscrito publicado.</p>';
+                return;
+            }
+
             grid.innerHTML = aprovados.map(a => `
-                <div class="glass-panel p-6 cursor-pointer hover:border-[var(--gold-primary)]" onclick="readArticle(${a.id})">
-                    ${a.image ? `<img src="${a.image}" class="w-full h-40 object-cover mb-4 rounded">` : ''}
-                    <h3 class="font-sacro text-xl mb-2">${a.title}</h3>
-                    <p class="text-sm text-gray-400 line-clamp-3">${a.content}</p>
+                <div class="glass-panel p-6 cursor-pointer hover:border-[var(--gold-primary)] group" onclick="readArticle(${a.id})">
+                    ${a.image ? `<img src="${a.image}" class="w-full h-40 object-cover mb-4 rounded opacity-80 group-hover:opacity-100 transition">` : ''}
+                    <h3 class="font-sacro text-xl mb-2 text-[var(--gold-primary)]">${a.title}</h3>
+                    <p class="text-sm text-gray-400 line-clamp-3 font-reading italic">${a.content}</p>
+                    <div class="mt-4 text-[10px] tracking-widest text-gray-600 uppercase">Leia o Manuscrito →</div>
                 </div>
             `).join('');
         }
 
         function readArticle(id) {
             const a = articles.find(art => art.id === id);
+            if(!a) return;
             document.getElementById('leitor-titulo').innerText = a.title;
             document.getElementById('leitor-conteudo').innerText = a.content;
             const banner = document.getElementById('leitor-banner');
@@ -299,56 +316,69 @@
         // MODERAÇÃO (ADMIN)
         function adminLogin() {
             const pass = prompt("Chave da Sacristia:");
-            if(pass === "AMDG") navigate('admin');
+            if(pass === "AMDG") {
+                navigate('admin');
+            } else if (pass !== null) {
+                alert("Chave incorreta.");
+            }
         }
 
         function renderAdminDashboard() {
             // Lista de Pendentes
-            document.getElementById('admin-pending-list').innerHTML = articles.filter(a => a.status === 'pendente').map(a => `
+            const pendingList = articles.filter(a => a.status === 'pendente');
+            document.getElementById('admin-pending-list').innerHTML = pendingList.length ? pendingList.map(a => `
                 <div class="p-4 bg-white/5 border border-white/10 flex justify-between items-center">
-                    <span>${a.title}</span>
+                    <span class="font-reading">${a.title}</span>
                     <div class="flex gap-2">
-                        <button onclick="approveArt(${a.id})" class="text-green-500 text-[10px] border border-green-500 px-2 py-1">APROVAR</button>
-                        <button onclick="deleteArt(${a.id})" class="text-red-500 text-[10px] border border-red-500 px-2 py-1">APAGAR</button>
+                        <button onclick="approveArt(${a.id})" class="text-green-500 text-[10px] border border-green-500 px-3 py-1 hover:bg-green-500 hover:text-black transition">APROVAR</button>
+                        <button onclick="deleteArt(${a.id})" class="text-red-500 text-[10px] border border-red-500 px-3 py-1 hover:bg-red-500 hover:text-white transition">REJEITAR</button>
                     </div>
                 </div>
-            `).join('');
+            `).join('') : '<p class="text-gray-600 text-xs italic">Nenhum manuscrito aguardando revisão.</p>';
 
-            // Lista de Publicados
-            document.getElementById('admin-published-list').innerHTML = articles.filter(a => a.status === 'aprovado').map(a => `
-                <div class="p-4 bg-white/5 flex justify-between items-center">
-                    <span class="text-gray-400 text-sm">${a.title}</span>
-                    <button onclick="deleteArt(${a.id})" class="delete-badge">REMOVER DO SITE</button>
+            // Lista de Publicados para Exclusão
+            const approvedList = articles.filter(a => a.status === 'aprovado');
+            document.getElementById('admin-published-list').innerHTML = approvedList.length ? approvedList.map(a => `
+                <div class="p-4 bg-white/5 flex justify-between items-center border-b border-white/5">
+                    <span class="text-gray-400 text-sm font-reading">${a.title}</span>
+                    <button onclick="deleteArt(${a.id})" class="delete-badge uppercase font-bold">Excluir do Site</button>
                 </div>
-            `).join('');
+            `).join('') : '<p class="text-gray-600 text-xs italic">Nenhum artigo publicado.</p>';
 
-            // Lista de Orações
-            document.getElementById('admin-prayer-list').innerHTML = prayers.map(p => `
-                <div class="p-4 border-b border-white/5 flex justify-between items-start">
-                    <p class="text-xs italic">"${p.content.substring(0,50)}..."</p>
-                    <button onclick="deletePrayer(${p.id})" class="text-red-500 ml-2"><i class="fas fa-trash"></i></button>
+            // Lista de Orações para Moderação
+            document.getElementById('admin-prayer-list').innerHTML = prayers.length ? prayers.map(p => `
+                <div class="p-4 border-b border-white/5 flex justify-between items-start bg-white/5 mb-2">
+                    <div class="max-w-[80%]">
+                        <p class="text-[10px] text-[var(--gold-primary)] uppercase font-bold">${p.name}</p>
+                        <p class="text-xs italic text-gray-400">"${p.content.substring(0,80)}${p.content.length > 80 ? '...' : ''}"</p>
+                    </div>
+                    <button onclick="deletePrayer(${p.id})" class="text-red-500 hover:text-red-300 transition p-2"><i class="fas fa-trash-alt"></i></button>
                 </div>
-            `).join('');
+            `).join('') : '<p class="text-gray-600 text-xs italic text-center">A capela está vazia.</p>';
         }
 
         function approveArt(id) {
             const a = articles.find(x => x.id === id);
-            a.status = 'aprovado';
-            saveAndRefresh();
+            if(a) {
+                a.status = 'aprovado';
+                saveAndRefresh();
+            }
         }
 
         function deleteArt(id) {
-            if(confirm("Deseja apagar este artigo para sempre?")) {
+            if(confirm("Deseja apagar este manuscrito permanentemente? Esta ação não pode ser desfeita.")) {
                 articles = articles.filter(x => x.id !== id);
                 saveAndRefresh();
             }
         }
 
         function deletePrayer(id) {
-            prayers = prayers.filter(x => x.id !== id);
-            localStorage.setItem('sacra_prayers', JSON.stringify(prayers));
-            renderAdminDashboard();
-            renderPrayers();
+            if(confirm("Remover esta intenção de oração?")) {
+                prayers = prayers.filter(x => x.id !== id);
+                localStorage.setItem('sacra_prayers', JSON.stringify(prayers));
+                renderAdminDashboard();
+                renderPrayers();
+            }
         }
 
         function saveAndRefresh() {
@@ -358,5 +388,4 @@
         }
     </script>
 </body>
-
 </html>
