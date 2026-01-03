@@ -1,243 +1,362 @@
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-br" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SACRA v13 | Portal de Pensamento e Instrução</title>
+    <title>SACRA v17 | Moderação e Institucional</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
-    <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700;900&family=Inter:wght@300;400;600;800&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700&family=Inter:wght@300;400;500&family=Playfair+Display:ital,wght@0,400;0,700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
     <style>
         :root {
-            --bg: #050505; --text: #e2e8f0; --gold: #d4af37; --gold-light: #fcf6ba;
-            --glass: rgba(10, 10, 15, 0.95); --border: rgba(212, 175, 55, 0.2);
-        }
-        [data-theme="light"] {
-            --bg: #f5f5f0; --text: #1a1a1a; --gold: #a67c00; --gold-light: #d4af37;
-            --glass: rgba(245, 245, 240, 0.95); --border: rgba(166, 124, 0, 0.3);
+            --bg-deep: #030303;
+            --bg-card: rgba(20, 20, 20, 0.7);
+            --gold-primary: #d4af37;
+            --gold-metallic: linear-gradient(135deg, #bf953f, #fcf6ba, #b38728, #fbf5b7, #aa771c);
         }
 
         body { 
-            background-color: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; 
-            margin: 0; transition: 0.5s cubic-bezier(0.4, 0, 0.2, 1);
-            background-image: radial-gradient(circle at 50% 0%, rgba(212, 175, 55, 0.1) 0%, transparent 50%);
+            background-color: var(--bg-deep); 
+            color: #e2e8f0; 
+            font-family: 'Inter', sans-serif;
+            background-image: radial-gradient(circle at 50% 0%, rgba(212, 175, 55, 0.08) 0%, transparent 50%);
         }
 
-        .noise {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            pointer-events: none; z-index: 50; opacity: 0.05;
-            background: url('https://grainy-gradients.vercel.app/noise.svg');
+        .font-sacro { font-family: 'Cinzel Decorative', serif; }
+        .font-reading { font-family: 'Playfair Display', serif; }
+
+        .btn-sacra {
+            display: inline-block;
+            position: relative;
+            background: transparent;
+            color: var(--gold-primary);
+            border: 1px solid var(--gold-primary);
+            padding: 12px 30px;
+            font-size: 0.75rem;
+            letter-spacing: 0.2em;
+            text-transform: uppercase;
+            font-weight: 700;
+            transition: all 0.4s ease;
+            cursor: pointer;
+            text-align: center;
+        }
+        .btn-sacra:hover { background: var(--gold-primary); color: black; box-shadow: 0 0 20px rgba(212, 175, 55, 0.4); }
+
+        .glass-panel {
+            background: var(--bg-card);
+            backdrop-filter: blur(16px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            transition: all 0.3s;
         }
 
-        .serif-sacro { font-family: 'Cinzel Decorative', serif; }
-        .serif-reading { font-family: 'Playfair Display', serif; }
+        .section-view { display: none; opacity: 0; animation: fadeIn 0.8s forwards; padding-top: 100px; min-height: 100vh; }
+        .section-view.active { display: block; }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 
-        .gold-gradient { 
-            background: linear-gradient(135deg, var(--gold) 0%, var(--gold-light) 50%, var(--gold) 100%); 
-            -webkit-background-clip: text; -webkit-text-fill-color: transparent; 
+        .input-sacra {
+            background: rgba(255,255,255,0.03);
+            border-bottom: 1px solid rgba(255,255,255,0.2);
+            color: white;
+            padding: 1rem;
+            width: 100%;
         }
+        .input-sacra:focus { outline: none; border-color: var(--gold-primary); }
 
-        .btn-divino { 
-            background: linear-gradient(to right, #8a6d1d, var(--gold)); color: #000; 
-            padding: 14px 35px; border-radius: 2px; font-weight: 800; font-size: 10px; 
-            letter-spacing: 3px; text-transform: uppercase; border: 1px solid var(--gold);
-            cursor: pointer; transition: 0.3s; display: inline-block;
+        .modal-overlay {
+            display: none; position: fixed; z-index: 2000; inset: 0;
+            background: rgba(0,0,0,0.95); justify-content: center; align-items: center;
         }
-        .btn-divino:hover { box-shadow: 0 0 20px rgba(212, 175, 55, 0.4); transform: translateY(-2px); }
-
-        .card-sacra { 
-            background: var(--glass); border: 1px solid var(--border); 
-            padding: 40px; border-radius: 4px; transition: 0.4s; position: relative;
+        .modal-overlay.active { display: flex; }
+        
+        .delete-badge {
+            font-size: 10px;
+            color: #ff4444;
+            cursor: pointer;
+            border: 1px solid #ff4444;
+            padding: 2px 6px;
+            border-radius: 4px;
+            transition: 0.3s;
         }
-        .card-sacra:hover { border-color: var(--gold); }
-
-        nav { backdrop-filter: blur(20px); background: var(--glass); border-bottom: 1px solid var(--border); z-index: 1000; position: fixed; width: 100%; top: 0; }
-
-        .page { display: none; opacity: 0; padding: 160px 20px 100px 20px; min-height: 100vh; }
-        .page.active { display: block !important; animation: pageIn 0.8s ease forwards; }
-        @keyframes pageIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+        .delete-badge:hover { background: #ff4444; color: white; }
     </style>
 </head>
 <body>
 
-    <div class="noise"></div>
-
-    <nav class="h-24 flex items-center px-6 md:px-12 justify-between">
-        <h1 class="serif-sacro text-2xl tracking-[0.3em] cursor-pointer gold-gradient" onclick="navTo('home')">SACRA</h1>
-        
-        <div class="hidden lg:flex items-center gap-8 text-[10px] font-bold uppercase tracking-widest text-gray-400">
-            <button onclick="navTo('portal')" class="hover:text-[var(--gold)]">Biblioteca de Teses</button>
-            <button onclick="navTo('diaria')" class="hover:text-[var(--gold)]">Instrução Litúrgica</button>
-            <button onclick="navTo('contact')" class="hover:text-[var(--gold)]">Mural de Orações</button>
-            <button onclick="navTo('colab')" class="btn-divino ml-4">Escrever Artigo</button>
-            <button onclick="toggleTheme()" class="text-lg ml-4"><i id="t-icon" class="fas fa-moon"></i></button>
-            <button onclick="checkAdmin()" class="opacity-30 hover:opacity-100 px-2"><i class="fas fa-key"></i></button>
+    <nav class="fixed w-full z-50 border-b border-white/5 bg-black/80 backdrop-blur-md">
+        <div class="max-w-7xl mx-auto px-6 h-24 flex items-center justify-between">
+            <div class="flex flex-col cursor-pointer" onclick="navigate('home')">
+                <h1 class="font-sacro text-2xl tracking-[0.2em] text-[var(--gold-primary)]">SACRA</h1>
+                <span class="text-[8px] uppercase tracking-[0.4em] text-gray-500">Aeterna Veritas</span>
+            </div>
+            <div class="hidden lg:flex items-center gap-8 text-[10px] font-bold uppercase tracking-[0.2em] text-gray-400">
+                <button onclick="navigate('liturgia')" class="hover:text-white transition">Liturgia</button>
+                <button onclick="navigate('biblioteca')" class="hover:text-white transition">Biblioteca</button>
+                <button onclick="navigate('oracoes')" class="hover:text-white transition">Orações</button>
+                <button onclick="navigate('sobre')" class="hover:text-white transition">Sobre</button>
+                <button onclick="navigate('contato')" class="hover:text-white transition">Contato</button>
+                <button onclick="navigate('escrever')" class="text-[var(--gold-primary)]"><i class="fas fa-pen-nib"></i></button>
+                <button onclick="adminLogin()" class="hover:text-white"><i class="fas fa-key"></i></button>
+            </div>
         </div>
     </nav>
 
     <main>
-        <section id="home" class="page active text-center">
-            <div data-aos="zoom-out" data-aos-duration="1500">
-                <p class="text-[var(--gold)] tracking-[0.6em] text-[10px] uppercase mb-8">Pensamento e Tradição</p>
-                <h2 class="serif-reading text-6xl md:text-9xl font-black mb-12 leading-none">Beleza <br><span class="italic font-light opacity-80 text-white">Incorruptível</span></h2>
-                <div class="flex gap-4 justify-center">
-                    <button onclick="navTo('portal')" class="btn-divino">Explorar Artigos</button>
-                    <button onclick="navTo('diaria')" class="px-8 py-3 border border-white/20 uppercase text-[10px] tracking-widest hover:bg-white/5 transition">Instruções</button>
+        
+        <section id="home" class="section-view active flex flex-col items-center justify-center text-center">
+            <h2 class="font-reading text-6xl md:text-8xl font-bold mb-4">Sacrum Convivium</h2>
+            <p class="text-gray-400 max-w-lg mx-auto mb-8">Refúgio espiritual para a alma em busca da Verdade.</p>
+            <button onclick="navigate('liturgia')" class="btn-sacra">Abrir o Missal</button>
+        </section>
+
+        <section id="liturgia" class="section-view max-w-5xl mx-auto px-6">
+            <div class="text-center mb-12">
+                <h2 id="tempo-liturgico" class="text-[var(--gold-primary)] uppercase tracking-widest text-sm mb-2">Carregando Tempo...</h2>
+                <h3 class="font-sacro text-4xl mb-4">Liturgia de Hoje</h3>
+                <p id="santo-do-dia" class="font-reading italic text-xl text-gray-400">Carregando Santo...</p>
+            </div>
+            <div class="glass-panel p-8 md:p-12">
+                <div id="liturgia-content" class="font-reading text-xl leading-relaxed text-center italic">
+                    "Buscai as coisas do alto, onde Cristo está sentado à direita de Deus."
                 </div>
+            </div>
+            <div class="flex justify-center gap-4 mt-8">
+                <a href="https://www.cnbb.org.br/liturgia-diaria/" target="_blank" class="btn-sacra text-[9px]">Fonte CNBB</a>
             </div>
         </section>
 
-        <section id="diaria" class="page max-w-5xl mx-auto">
-            <div class="text-center mb-16">
-                <h2 class="serif-sacro text-4xl gold-gradient mb-4">Instrução Litúrgica</h2>
-                <p class="opacity-50 italic serif-reading text-xl">Fontes para a meditação e o reto cumprimento do Rito.</p>
-            </div>
-
-            <div class="grid md:grid-cols-2 gap-8 mb-16">
-                <div class="card-sacra">
-                    <h3 class="serif-sacro text-[10px] mb-6 tracking-widest text-[var(--gold)] uppercase">Portal Oficial CNBB</h3>
-                    <p class="serif-reading text-2xl mb-8">Acesse as leituras diárias diretamente da fonte episcopal.</p>
-                    <a href="https://www.cnbb.org.br/liturgia-diaria/" target="_blank" class="btn-divino !bg-transparent !text-[var(--gold)] hover:!bg-[var(--gold)] hover:!text-black">Acessar CNBB</a>
-                </div>
-                <div class="card-sacra">
-                    <h3 class="serif-sacro text-[10px] mb-6 tracking-widest text-[var(--gold)] uppercase">Liturgia Canção Nova</h3>
-                    <p class="serif-reading text-2xl mb-8">Meditações comentadas e áudio das leituras do dia.</p>
-                    <a href="https://liturgia.cancaonova.com/pb/" target="_blank" class="btn-divino !bg-transparent !text-[var(--gold)] hover:!bg-[var(--gold)] hover:!text-black">Canção Nova</a>
-                </div>
-            </div>
-        </section>
-
-        <section id="portal" class="page max-w-6xl mx-auto">
-            <h2 class="serif-sacro text-4xl mb-12 text-center gold-gradient">Biblioteca de Reflexões</h2>
+        <section id="biblioteca" class="section-view max-w-7xl mx-auto px-6">
+            <h2 class="font-sacro text-4xl mb-12 text-center">Scriptorium</h2>
             <div id="grid-artigos" class="grid md:grid-cols-3 gap-8"></div>
         </section>
 
-        <section id="contact" class="page max-w-3xl mx-auto">
-            <div class="text-center mb-12">
-                <h2 class="serif-sacro text-4xl gold-gradient mb-4">Intenções</h2>
-                <p class="opacity-50 italic">Mural de intercessão da comunidade.</p>
-            </div>
-            <div class="card-sacra mb-12">
-                <textarea id="p-prayer" placeholder="Escreva sua intenção..." class="w-full bg-transparent border border-white/10 p-4 h-32 outline-none focus:border-[var(--gold)]"></textarea>
-                <button onclick="addPrayer()" class="btn-divino w-full mt-4">Publicar</button>
-            </div>
-            <div id="prayer-wall" class="space-y-6"></div>
-        </section>
-
-        <section id="colab" class="page max-w-3xl mx-auto">
-            <div class="card-sacra">
-                <h2 class="serif-sacro text-2xl mb-8 text-center gold-gradient">Submeter Novo Manuscrito</h2>
-                <input id="p-title" type="text" placeholder="Título da Reflexão" class="w-full bg-transparent border border-white/10 p-4 mb-4 outline-none">
-                <textarea id="p-content" placeholder="Desenvolva seu artigo aqui..." class="w-full bg-transparent border border-white/10 p-4 h-80 outline-none"></textarea>
-                <button onclick="enviarArtigo()" class="btn-divino w-full mt-4">Enviar ao Conselho Curador</button>
+        <section id="sobre" class="section-view max-w-4xl mx-auto px-6">
+            <div class="glass-panel p-12">
+                <h2 class="font-sacro text-3xl mb-8 text-[var(--gold-primary)]">Sobre o Projeto</h2>
+                <div class="font-reading text-xl space-y-6 leading-relaxed">
+                    <p>O SACRA é um repositório dedicado à preservação da cultura católica tradicional e do pensamento clássico.</p>
+                    <p>Nossa missão é oferecer um espaço de silêncio e beleza em meio ao caos digital, conectando fiéis às leituras diárias, artes sacras e orações comunitárias.</p>
+                </div>
             </div>
         </section>
 
-        <section id="admin" class="page max-w-4xl mx-auto">
-            <h2 class="serif-sacro text-3xl mb-12 border-b border-[var(--gold)] pb-4">Conselho Curador</h2>
-            <div id="admin-lista" class="space-y-4"></div>
+        <section id="contato" class="section-view max-w-4xl mx-auto px-6">
+            <div class="glass-panel p-12">
+                <h2 class="font-sacro text-3xl mb-8 text-[var(--gold-primary)]">Contato</h2>
+                <p class="mb-8 text-gray-400">Para sugestões ou envio de manuscritos originais, utilize o canal abaixo:</p>
+                <div class="space-y-4">
+                    <input type="text" placeholder="Assunto" class="input-sacra">
+                    <textarea placeholder="Sua mensagem..." class="input-sacra h-32 resize-none"></textarea>
+                    <button class="btn-sacra w-full">Enviar Mensagem</button>
+                </div>
+            </div>
         </section>
 
-        <section id="reader" class="page max-w-3xl mx-auto">
-            <button onclick="navTo('portal')" class="mb-8 opacity-50 text-[10px] tracking-widest">← VOLTAR À BIBLIOTECA</button>
-            <div id="reader-content" class="serif-reading text-2xl leading-relaxed"></div>
+        <section id="oracoes" class="section-view max-w-5xl mx-auto px-6">
+            <h2 class="font-sacro text-4xl mb-12 text-center">Capela Virtual</h2>
+            <div class="grid md:grid-cols-2 gap-12">
+                <div class="glass-panel p-8">
+                    <h3 class="font-sacro text-xl mb-6">Pedir Intercessão</h3>
+                    <input id="prayer-name" type="text" placeholder="Seu Nome" class="input-sacra mb-4">
+                    <textarea id="prayer-content" placeholder="Sua intenção..." class="input-sacra h-32 mb-6 resize-none"></textarea>
+                    <button onclick="submitPrayer()" class="btn-sacra w-full">Ofertar</button>
+                </div>
+                <div id="prayer-wall" class="space-y-4 max-h-[500px] overflow-y-auto pr-4"></div>
+            </div>
         </section>
+
+        <section id="admin" class="section-view max-w-6xl mx-auto px-6">
+            <div class="flex justify-between items-center mb-10">
+                <h2 class="font-sacro text-3xl text-[var(--gold-primary)]">Controle de Moderação</h2>
+                <button onclick="navigate('home')" class="text-xs text-red-500">Sair do Modo Admin</button>
+            </div>
+
+            <div class="grid lg:grid-cols-3 gap-8">
+                <div class="lg:col-span-2 space-y-8">
+                    <div class="glass-panel p-6">
+                        <h3 class="text-xs uppercase tracking-widest text-gray-500 mb-6">Pendentes para Aprovação</h3>
+                        <div id="admin-pending-list" class="space-y-4"></div>
+                    </div>
+                    <div class="glass-panel p-6 border-t border-red-900/40">
+                        <h3 class="text-xs uppercase tracking-widest text-red-500 mb-6">Acervo Publicado (Excluir)</h3>
+                        <div id="admin-published-list" class="space-y-4"></div>
+                    </div>
+                </div>
+                <div class="glass-panel p-6">
+                    <h3 class="text-xs uppercase tracking-widest text-gray-500 mb-6">Moderar Orações</h3>
+                    <div id="admin-prayer-list" class="space-y-4 max-h-[600px] overflow-y-auto"></div>
+                </div>
+            </div>
+        </section>
+
+        <section id="escrever" class="section-view max-w-3xl mx-auto px-6">
+            <div class="glass-panel p-10">
+                <h2 class="font-sacro text-3xl mb-8 text-center">Novo Artigo</h2>
+                <input id="art-title" type="text" placeholder="Título" class="input-sacra mb-6 text-xl">
+                <input id="art-image" type="text" placeholder="URL da Foto (opcional)" class="input-sacra mb-6">
+                <textarea id="art-content" placeholder="Conteúdo..." class="input-sacra h-64 mb-8 resize-none"></textarea>
+                <button onclick="submitArticle()" class="btn-sacra w-full">Submeter</button>
+            </div>
+        </section>
+
+        <section id="leitor" class="section-view max-w-4xl mx-auto px-6">
+            <button onclick="navigate('biblioteca')" class="mb-8 text-[var(--gold-primary)] text-xs uppercase"><i class="fas fa-arrow-left"></i> Voltar</button>
+            <div id="leitor-banner" class="w-full h-96 bg-cover bg-center rounded mb-10 hidden"></div>
+            <h1 id="leitor-titulo" class="font-sacro text-5xl mb-8 text-center"></h1>
+            <div id="leitor-conteudo" class="font-reading text-xl leading-relaxed text-justify space-y-6"></div>
+        </section>
+
     </main>
 
-    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
     <script>
-        let db = JSON.parse(localStorage.getItem('sacra_v13_db')) || [
-            { id: 1, title: "O Silêncio e a Metafísica", content: "A busca pela verdade exige um recolhimento que o mundo moderno tenta extinguir...", status: 'aprovado' }
+        // BANCO DE DADOS
+        let articles = JSON.parse(localStorage.getItem('sacra_articles')) || [
+            { id: 1, title: "Exemplo de Postagem", content: "Este é um artigo padrão.", status: "aprovado", image: "" }
         ];
         let prayers = JSON.parse(localStorage.getItem('sacra_prayers')) || [];
 
-        window.onload = () => { AOS.init(); renderPortal(); renderPrayers(); };
-
-        function navTo(id) {
-            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-            window.scrollTo({top: 0, behavior: 'smooth'});
-            setTimeout(() => document.getElementById(id).classList.add('active'), 50);
-        }
-
-        function toggleTheme() {
-            const b = document.body;
-            const i = document.getElementById('t-icon');
-            if(b.getAttribute('data-theme') === 'light') {
-                b.removeAttribute('data-theme');
-                i.className = 'fas fa-moon';
-            } else {
-                b.setAttribute('data-theme', 'light');
-                i.className = 'fas fa-sun';
-            }
-        }
-
-        function addPrayer() {
-            const v = document.getElementById('p-prayer').value;
-            if(!v) return;
-            prayers.unshift({ text: v, date: new Date().toLocaleDateString() });
-            localStorage.setItem('sacra_prayers', JSON.stringify(prayers));
-            document.getElementById('p-prayer').value = "";
+        window.onload = () => {
+            renderArticles();
             renderPrayers();
+            updateLiturgia();
+        };
+
+        function navigate(id) {
+            document.querySelectorAll('.section-view').forEach(s => s.classList.remove('active'));
+            document.getElementById(id).classList.add('active');
+            window.scrollTo(0,0);
+            if(id === 'admin') renderAdminDashboard();
+        }
+
+        // LITURGIA (BASEADA EM DATA REAL)
+        function updateLiturgia() {
+            const h = new Date();
+            const dias = ["Domingo", "Segunda", "Terça", "Quarta", "Quinta", "Sexta", "Sábado"];
+            document.getElementById('tempo-liturgico').innerText = `Tempo do natal - ${dias[h.getDay()]}`;
+            document.getElementById('santo-do-dia').innerText = "Santo do dia em https://santo.cancaonova.com/";
+        }
+
+        // ORAÇÕES
+        function submitPrayer() {
+            const name = document.getElementById('prayer-name').value || "Anônimo";
+            const content = document.getElementById('prayer-content').value;
+            if(!content) return;
+            
+            prayers.unshift({ id: Date.now(), name, content });
+            localStorage.setItem('sacra_prayers', JSON.stringify(prayers));
+            renderPrayers();
+            document.getElementById('prayer-content').value = "";
         }
 
         function renderPrayers() {
             document.getElementById('prayer-wall').innerHTML = prayers.map(p => `
-                <div class="card-sacra !p-6 border-l-4 border-l-[var(--gold)]">
-                    <p class="serif-reading italic opacity-90">"${p.text}"</p>
-                    <p class="text-[8px] mt-4 tracking-widest opacity-30">${p.date}</p>
+                <div class="border-l-2 border-[var(--gold-primary)] pl-4 py-2 bg-white/5">
+                    <p class="italic text-gray-300 font-reading">"${p.content}"</p>
+                    <p class="text-[10px] text-[var(--gold-primary)] mt-1">— ${p.name}</p>
                 </div>
             `).join('');
         }
 
-        function renderPortal() {
-            const aprovados = db.filter(x => x.status === 'aprovado');
-            document.getElementById('grid-artigos').innerHTML = aprovados.map(p => `
-                <div class="card-sacra cursor-pointer group" onclick="lerArtigo(${p.id})">
-                    <h3 class="serif-reading text-2xl mb-4 group-hover:text-[var(--gold)] transition">${p.title}</h3>
-                    <span class="text-[10px] tracking-widest text-[var(--gold)] uppercase">Acessar Tese</span>
+        // BIBLIOTECA
+        function submitArticle() {
+            const title = document.getElementById('art-title').value;
+            const content = document.getElementById('art-content').value;
+            const image = document.getElementById('art-image').value;
+            if(!title || !content) return;
+
+            articles.push({ id: Date.now(), title, content, image, status: 'pendente' });
+            localStorage.setItem('sacra_articles', JSON.stringify(articles));
+            alert("Enviado para moderação!");
+            navigate('biblioteca');
+        }
+
+        function renderArticles() {
+            const grid = document.getElementById('grid-artigos');
+            const aprovados = articles.filter(a => a.status === 'aprovado');
+            grid.innerHTML = aprovados.map(a => `
+                <div class="glass-panel p-6 cursor-pointer hover:border-[var(--gold-primary)]" onclick="readArticle(${a.id})">
+                    ${a.image ? `<img src="${a.image}" class="w-full h-40 object-cover mb-4 rounded">` : ''}
+                    <h3 class="font-sacro text-xl mb-2">${a.title}</h3>
+                    <p class="text-sm text-gray-400 line-clamp-3">${a.content}</p>
                 </div>
             `).join('');
         }
 
-        function lerArtigo(id) {
-            const p = db.find(x => x.id === id);
-            navTo('reader');
-            document.getElementById('reader-content').innerHTML = `<h1 class="serif-reading text-6xl mb-12 gold-gradient">${p.title}</h1>${p.content}`;
+        function readArticle(id) {
+            const a = articles.find(art => art.id === id);
+            document.getElementById('leitor-titulo').innerText = a.title;
+            document.getElementById('leitor-conteudo').innerText = a.content;
+            const banner = document.getElementById('leitor-banner');
+            if(a.image) {
+                banner.style.backgroundImage = `url(${a.image})`;
+                banner.classList.remove('hidden');
+            } else banner.classList.add('hidden');
+            navigate('leitor');
         }
 
-        function enviarArtigo() {
-            const t = document.getElementById('p-title').value;
-            const c = document.getElementById('p-content').value;
-            if(!t || !c) return;
-            db.push({ id: Date.now(), title: t, content: c, status: 'pendente' });
-            localStorage.setItem('sacra_v13_db', JSON.stringify(db));
-            alert("Enviado para revisão curatorial.");
-            navTo('home');
+        // MODERAÇÃO (ADMIN)
+        function adminLogin() {
+            const pass = prompt("Chave da Sacristia:");
+            if(pass === "AMDG") navigate('admin');
         }
 
-        function checkAdmin() {
-            if(prompt("Chave Curatorial:") === "AMDG") { navTo('admin'); renderAdmin(); }
-        }
-
-        function renderAdmin() {
-            const pendentes = db.filter(x => x.status === 'pendente');
-            document.getElementById('admin-lista').innerHTML = pendentes.map(p => `
-                <div class="card-sacra flex justify-between items-center">
-                    <span>${p.title}</span>
-                    <button onclick="aprovar(${p.id})" class="text-[var(--gold)] font-bold">APROVAR</button>
+        function renderAdminDashboard() {
+            // Lista de Pendentes
+            document.getElementById('admin-pending-list').innerHTML = articles.filter(a => a.status === 'pendente').map(a => `
+                <div class="p-4 bg-white/5 border border-white/10 flex justify-between items-center">
+                    <span>${a.title}</span>
+                    <div class="flex gap-2">
+                        <button onclick="approveArt(${a.id})" class="text-green-500 text-[10px] border border-green-500 px-2 py-1">APROVAR</button>
+                        <button onclick="deleteArt(${a.id})" class="text-red-500 text-[10px] border border-red-500 px-2 py-1">APAGAR</button>
+                    </div>
                 </div>
-            `).join('') || '<p class="opacity-30 italic">Sem manuscritos para revisão.</p>';
+            `).join('');
+
+            // Lista de Publicados
+            document.getElementById('admin-published-list').innerHTML = articles.filter(a => a.status === 'aprovado').map(a => `
+                <div class="p-4 bg-white/5 flex justify-between items-center">
+                    <span class="text-gray-400 text-sm">${a.title}</span>
+                    <button onclick="deleteArt(${a.id})" class="delete-badge">REMOVER DO SITE</button>
+                </div>
+            `).join('');
+
+            // Lista de Orações
+            document.getElementById('admin-prayer-list').innerHTML = prayers.map(p => `
+                <div class="p-4 border-b border-white/5 flex justify-between items-start">
+                    <p class="text-xs italic">"${p.content.substring(0,50)}..."</p>
+                    <button onclick="deletePrayer(${p.id})" class="text-red-500 ml-2"><i class="fas fa-trash"></i></button>
+                </div>
+            `).join('');
         }
 
-        function aprovar(id) {
-            db.find(x => x.id === id).status = 'aprovado';
-            localStorage.setItem('sacra_v13_db', JSON.stringify(db));
-            renderAdmin();
-            renderPortal();
+        function approveArt(id) {
+            const a = articles.find(x => x.id === id);
+            a.status = 'aprovado';
+            saveAndRefresh();
+        }
+
+        function deleteArt(id) {
+            if(confirm("Deseja apagar este artigo para sempre?")) {
+                articles = articles.filter(x => x.id !== id);
+                saveAndRefresh();
+            }
+        }
+
+        function deletePrayer(id) {
+            prayers = prayers.filter(x => x.id !== id);
+            localStorage.setItem('sacra_prayers', JSON.stringify(prayers));
+            renderAdminDashboard();
+            renderPrayers();
+        }
+
+        function saveAndRefresh() {
+            localStorage.setItem('sacra_articles', JSON.stringify(articles));
+            renderAdminDashboard();
+            renderArticles();
         }
     </script>
 </body>
+
 </html>
