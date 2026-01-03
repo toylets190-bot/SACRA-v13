@@ -1,0 +1,243 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SACRA v13 | Portal de Pensamento e Instrução</title>
+    
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://unpkg.com/aos@2.3.1/dist/aos.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel+Decorative:wght@400;700;900&family=Inter:wght@300;400;600;800&family=Playfair+Display:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        :root {
+            --bg: #050505; --text: #e2e8f0; --gold: #d4af37; --gold-light: #fcf6ba;
+            --glass: rgba(10, 10, 15, 0.95); --border: rgba(212, 175, 55, 0.2);
+        }
+        [data-theme="light"] {
+            --bg: #f5f5f0; --text: #1a1a1a; --gold: #a67c00; --gold-light: #d4af37;
+            --glass: rgba(245, 245, 240, 0.95); --border: rgba(166, 124, 0, 0.3);
+        }
+
+        body { 
+            background-color: var(--bg); color: var(--text); font-family: 'Inter', sans-serif; 
+            margin: 0; transition: 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            background-image: radial-gradient(circle at 50% 0%, rgba(212, 175, 55, 0.1) 0%, transparent 50%);
+        }
+
+        .noise {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            pointer-events: none; z-index: 50; opacity: 0.05;
+            background: url('https://grainy-gradients.vercel.app/noise.svg');
+        }
+
+        .serif-sacro { font-family: 'Cinzel Decorative', serif; }
+        .serif-reading { font-family: 'Playfair Display', serif; }
+
+        .gold-gradient { 
+            background: linear-gradient(135deg, var(--gold) 0%, var(--gold-light) 50%, var(--gold) 100%); 
+            -webkit-background-clip: text; -webkit-text-fill-color: transparent; 
+        }
+
+        .btn-divino { 
+            background: linear-gradient(to right, #8a6d1d, var(--gold)); color: #000; 
+            padding: 14px 35px; border-radius: 2px; font-weight: 800; font-size: 10px; 
+            letter-spacing: 3px; text-transform: uppercase; border: 1px solid var(--gold);
+            cursor: pointer; transition: 0.3s; display: inline-block;
+        }
+        .btn-divino:hover { box-shadow: 0 0 20px rgba(212, 175, 55, 0.4); transform: translateY(-2px); }
+
+        .card-sacra { 
+            background: var(--glass); border: 1px solid var(--border); 
+            padding: 40px; border-radius: 4px; transition: 0.4s; position: relative;
+        }
+        .card-sacra:hover { border-color: var(--gold); }
+
+        nav { backdrop-filter: blur(20px); background: var(--glass); border-bottom: 1px solid var(--border); z-index: 1000; position: fixed; width: 100%; top: 0; }
+
+        .page { display: none; opacity: 0; padding: 160px 20px 100px 20px; min-height: 100vh; }
+        .page.active { display: block !important; animation: pageIn 0.8s ease forwards; }
+        @keyframes pageIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+    </style>
+</head>
+<body>
+
+    <div class="noise"></div>
+
+    <nav class="h-24 flex items-center px-6 md:px-12 justify-between">
+        <h1 class="serif-sacro text-2xl tracking-[0.3em] cursor-pointer gold-gradient" onclick="navTo('home')">SACRA</h1>
+        
+        <div class="hidden lg:flex items-center gap-8 text-[10px] font-bold uppercase tracking-widest text-gray-400">
+            <button onclick="navTo('portal')" class="hover:text-[var(--gold)]">Biblioteca de Teses</button>
+            <button onclick="navTo('diaria')" class="hover:text-[var(--gold)]">Instrução Litúrgica</button>
+            <button onclick="navTo('contact')" class="hover:text-[var(--gold)]">Mural de Orações</button>
+            <button onclick="navTo('colab')" class="btn-divino ml-4">Escrever Artigo</button>
+            <button onclick="toggleTheme()" class="text-lg ml-4"><i id="t-icon" class="fas fa-moon"></i></button>
+            <button onclick="checkAdmin()" class="opacity-30 hover:opacity-100 px-2"><i class="fas fa-key"></i></button>
+        </div>
+    </nav>
+
+    <main>
+        <section id="home" class="page active text-center">
+            <div data-aos="zoom-out" data-aos-duration="1500">
+                <p class="text-[var(--gold)] tracking-[0.6em] text-[10px] uppercase mb-8">Pensamento e Tradição</p>
+                <h2 class="serif-reading text-6xl md:text-9xl font-black mb-12 leading-none">Beleza <br><span class="italic font-light opacity-80 text-white">Incorruptível</span></h2>
+                <div class="flex gap-4 justify-center">
+                    <button onclick="navTo('portal')" class="btn-divino">Explorar Artigos</button>
+                    <button onclick="navTo('diaria')" class="px-8 py-3 border border-white/20 uppercase text-[10px] tracking-widest hover:bg-white/5 transition">Instruções</button>
+                </div>
+            </div>
+        </section>
+
+        <section id="diaria" class="page max-w-5xl mx-auto">
+            <div class="text-center mb-16">
+                <h2 class="serif-sacro text-4xl gold-gradient mb-4">Instrução Litúrgica</h2>
+                <p class="opacity-50 italic serif-reading text-xl">Fontes para a meditação e o reto cumprimento do Rito.</p>
+            </div>
+
+            <div class="grid md:grid-cols-2 gap-8 mb-16">
+                <div class="card-sacra">
+                    <h3 class="serif-sacro text-[10px] mb-6 tracking-widest text-[var(--gold)] uppercase">Portal Oficial CNBB</h3>
+                    <p class="serif-reading text-2xl mb-8">Acesse as leituras diárias diretamente da fonte episcopal.</p>
+                    <a href="https://www.cnbb.org.br/liturgia-diaria/" target="_blank" class="btn-divino !bg-transparent !text-[var(--gold)] hover:!bg-[var(--gold)] hover:!text-black">Acessar CNBB</a>
+                </div>
+                <div class="card-sacra">
+                    <h3 class="serif-sacro text-[10px] mb-6 tracking-widest text-[var(--gold)] uppercase">Liturgia Canção Nova</h3>
+                    <p class="serif-reading text-2xl mb-8">Meditações comentadas e áudio das leituras do dia.</p>
+                    <a href="https://liturgia.cancaonova.com/pb/" target="_blank" class="btn-divino !bg-transparent !text-[var(--gold)] hover:!bg-[var(--gold)] hover:!text-black">Canção Nova</a>
+                </div>
+            </div>
+        </section>
+
+        <section id="portal" class="page max-w-6xl mx-auto">
+            <h2 class="serif-sacro text-4xl mb-12 text-center gold-gradient">Biblioteca de Reflexões</h2>
+            <div id="grid-artigos" class="grid md:grid-cols-3 gap-8"></div>
+        </section>
+
+        <section id="contact" class="page max-w-3xl mx-auto">
+            <div class="text-center mb-12">
+                <h2 class="serif-sacro text-4xl gold-gradient mb-4">Intenções</h2>
+                <p class="opacity-50 italic">Mural de intercessão da comunidade.</p>
+            </div>
+            <div class="card-sacra mb-12">
+                <textarea id="p-prayer" placeholder="Escreva sua intenção..." class="w-full bg-transparent border border-white/10 p-4 h-32 outline-none focus:border-[var(--gold)]"></textarea>
+                <button onclick="addPrayer()" class="btn-divino w-full mt-4">Publicar</button>
+            </div>
+            <div id="prayer-wall" class="space-y-6"></div>
+        </section>
+
+        <section id="colab" class="page max-w-3xl mx-auto">
+            <div class="card-sacra">
+                <h2 class="serif-sacro text-2xl mb-8 text-center gold-gradient">Submeter Novo Manuscrito</h2>
+                <input id="p-title" type="text" placeholder="Título da Reflexão" class="w-full bg-transparent border border-white/10 p-4 mb-4 outline-none">
+                <textarea id="p-content" placeholder="Desenvolva seu artigo aqui..." class="w-full bg-transparent border border-white/10 p-4 h-80 outline-none"></textarea>
+                <button onclick="enviarArtigo()" class="btn-divino w-full mt-4">Enviar ao Conselho Curador</button>
+            </div>
+        </section>
+
+        <section id="admin" class="page max-w-4xl mx-auto">
+            <h2 class="serif-sacro text-3xl mb-12 border-b border-[var(--gold)] pb-4">Conselho Curador</h2>
+            <div id="admin-lista" class="space-y-4"></div>
+        </section>
+
+        <section id="reader" class="page max-w-3xl mx-auto">
+            <button onclick="navTo('portal')" class="mb-8 opacity-50 text-[10px] tracking-widest">← VOLTAR À BIBLIOTECA</button>
+            <div id="reader-content" class="serif-reading text-2xl leading-relaxed"></div>
+        </section>
+    </main>
+
+    <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+    <script>
+        let db = JSON.parse(localStorage.getItem('sacra_v13_db')) || [
+            { id: 1, title: "O Silêncio e a Metafísica", content: "A busca pela verdade exige um recolhimento que o mundo moderno tenta extinguir...", status: 'aprovado' }
+        ];
+        let prayers = JSON.parse(localStorage.getItem('sacra_prayers')) || [];
+
+        window.onload = () => { AOS.init(); renderPortal(); renderPrayers(); };
+
+        function navTo(id) {
+            document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+            window.scrollTo({top: 0, behavior: 'smooth'});
+            setTimeout(() => document.getElementById(id).classList.add('active'), 50);
+        }
+
+        function toggleTheme() {
+            const b = document.body;
+            const i = document.getElementById('t-icon');
+            if(b.getAttribute('data-theme') === 'light') {
+                b.removeAttribute('data-theme');
+                i.className = 'fas fa-moon';
+            } else {
+                b.setAttribute('data-theme', 'light');
+                i.className = 'fas fa-sun';
+            }
+        }
+
+        function addPrayer() {
+            const v = document.getElementById('p-prayer').value;
+            if(!v) return;
+            prayers.unshift({ text: v, date: new Date().toLocaleDateString() });
+            localStorage.setItem('sacra_prayers', JSON.stringify(prayers));
+            document.getElementById('p-prayer').value = "";
+            renderPrayers();
+        }
+
+        function renderPrayers() {
+            document.getElementById('prayer-wall').innerHTML = prayers.map(p => `
+                <div class="card-sacra !p-6 border-l-4 border-l-[var(--gold)]">
+                    <p class="serif-reading italic opacity-90">"${p.text}"</p>
+                    <p class="text-[8px] mt-4 tracking-widest opacity-30">${p.date}</p>
+                </div>
+            `).join('');
+        }
+
+        function renderPortal() {
+            const aprovados = db.filter(x => x.status === 'aprovado');
+            document.getElementById('grid-artigos').innerHTML = aprovados.map(p => `
+                <div class="card-sacra cursor-pointer group" onclick="lerArtigo(${p.id})">
+                    <h3 class="serif-reading text-2xl mb-4 group-hover:text-[var(--gold)] transition">${p.title}</h3>
+                    <span class="text-[10px] tracking-widest text-[var(--gold)] uppercase">Acessar Tese</span>
+                </div>
+            `).join('');
+        }
+
+        function lerArtigo(id) {
+            const p = db.find(x => x.id === id);
+            navTo('reader');
+            document.getElementById('reader-content').innerHTML = `<h1 class="serif-reading text-6xl mb-12 gold-gradient">${p.title}</h1>${p.content}`;
+        }
+
+        function enviarArtigo() {
+            const t = document.getElementById('p-title').value;
+            const c = document.getElementById('p-content').value;
+            if(!t || !c) return;
+            db.push({ id: Date.now(), title: t, content: c, status: 'pendente' });
+            localStorage.setItem('sacra_v13_db', JSON.stringify(db));
+            alert("Enviado para revisão curatorial.");
+            navTo('home');
+        }
+
+        function checkAdmin() {
+            if(prompt("Chave Curatorial:") === "AMDG") { navTo('admin'); renderAdmin(); }
+        }
+
+        function renderAdmin() {
+            const pendentes = db.filter(x => x.status === 'pendente');
+            document.getElementById('admin-lista').innerHTML = pendentes.map(p => `
+                <div class="card-sacra flex justify-between items-center">
+                    <span>${p.title}</span>
+                    <button onclick="aprovar(${p.id})" class="text-[var(--gold)] font-bold">APROVAR</button>
+                </div>
+            `).join('') || '<p class="opacity-30 italic">Sem manuscritos para revisão.</p>';
+        }
+
+        function aprovar(id) {
+            db.find(x => x.id === id).status = 'aprovado';
+            localStorage.setItem('sacra_v13_db', JSON.stringify(db));
+            renderAdmin();
+            renderPortal();
+        }
+    </script>
+</body>
+</html>
